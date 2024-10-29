@@ -19,7 +19,7 @@ public class StudentCourseServiceImpl implements StudentCourseService {
     }
 
     public void enrollStudentInCourse(int studentId, int courseId) {
-        if (studentDao.getStudent(studentId) != null && courseDao.getCourse(courseId) != null) {
+        if (studentDao.getStudentById(studentId) != null && courseDao.getCourseById(courseId) != null) {
             studentCourseDao.enrollStudentInCourse(studentId, courseId);
         } else {
             throw new IllegalArgumentException("Student or Course not found.");

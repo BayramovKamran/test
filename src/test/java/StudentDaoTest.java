@@ -2,6 +2,7 @@ import org.example.dao.StudentDao;
 import org.example.dao.StudentDaoImpl;
 import org.example.model.Student;
 import org.example.util.Database;
+import org.h2.tools.Server;
 import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
@@ -16,32 +17,47 @@ class StudentDaoTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = Database.getH2Connection(); // Получаем соединение с H2
+        Server.createTcpServer().start();
+        connection = Database.getH2Connection(); // Пример метода подключения к H2
         studentDao = new StudentDaoImpl(connection);
-        clearDatabase();
+        initializeDatabase();
+    }
+
+    private void initializeDatabase() throws SQLException {
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("CREATE TABLE students (id INT AUTO_INCREMENT PRIMARY KEY, studentName VARCHAR(100) NOT NULL);");
+        }
     }
 
     @Test
     void testCreateStudent() {
         Student student = new Student();
-        student.setName("Test Student");
+        student.setStudentName("Test Student");
         studentDao.createStudent(student);
-
-        Student fetchedStudent = studentDao.getStudent(student.getId());
+        Student fetchedStudent = studentDao.getStudentById(student.getId());
         Assertions.assertNotNull(fetchedStudent);
-        Assertions.assertEquals("Test Student", fetchedStudent.getName());
+        Assertions.assertEquals("Test Student", fetchedStudent.getStudentName());
     }
 
     @Test
-    void testReadAllStudents() {
+    void testGetStudentById() {
+        Student student = new Student();
+        student.setStudentName("John Doe");
+        studentDao.createStudent(student);
+        Student fetchedStudent = studentDao.getStudentById(student.getId());
+        Assertions.assertNotNull(fetchedStudent);
+        Assertions.assertEquals("John Doe", fetchedStudent.getStudentName());
+    }
+
+
+    @Test
+    void testGetAllStudents() {
         Student student1 = new Student();
-        student1.setName("Student One");
+        student1.setStudentName("Student One");
         studentDao.createStudent(student1);
-
         Student student2 = new Student();
-        student2.setName("Student Two");
+        student2.setStudentName("Student Two");
         studentDao.createStudent(student2);
-
         List<Student> students = studentDao.getAllStudent();
         Assertions.assertEquals(2, students.size());
     }
@@ -49,33 +65,21 @@ class StudentDaoTest {
     @Test
     void testUpdateStudent() {
         Student student = new Student();
-        student.setName("Old Name");
+        student.setStudentName("Old Name");
         studentDao.createStudent(student);
-
-        student.setName("New Name");
+        student.setStudentName("New Name");
         studentDao.updateStudent(student);
-
-        Student updatedStudent = studentDao.getStudent(student.getId());
-        Assertions.assertEquals("New Name", updatedStudent.getName());
+        Student updatedStudent = studentDao.getStudentById(student.getId());
+        Assertions.assertEquals("New Name", updatedStudent.getStudentName());
     }
 
     @Test
     void testDeleteStudent() {
         Student student = new Student();
-        student.setName("Test Student");
+        student.setStudentName("Test Student");
         studentDao.createStudent(student);
-
         studentDao.deleteStudent(student.getId());
-        Assertions.assertNull(studentDao.getStudent(student.getId()));
-    }
-
-    // Метод для очистки базы данных
-    private void clearDatabase() {
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("DELETE FROM students");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Assertions.assertNull(studentDao.getStudentById(student.getId()));
     }
 
     @AfterEach

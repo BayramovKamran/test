@@ -15,14 +15,14 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void createStudent(Student student) {
-        if (student.getName() == null || student.getName().isEmpty()) {
+        if (student.getStudentName() == null || student.getStudentName().isEmpty()) {
             throw new IllegalArgumentException("Student name cannot be empty.");
         }
         studentDao.createStudent(student);
     }
 
-    public Student getStudent(int id) {
-        Student student = studentDao.getStudent(id);
+    public Student getStudentById(int id) {
+        Student student = studentDao.getStudentById(id);
         if (student == null) {
             throw new NullPointerException("Student with ID " + id + " not found.");
         }
@@ -38,7 +38,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public void deleteStudent(int id) {
-        if (studentDao.getStudent(id) == null) {
+        if (studentDao.getStudentById(id) == null) {
             throw new RuntimeException("Student with ID " + id + " not found.");
         }
         studentDao.deleteStudent(id);

@@ -15,7 +15,7 @@ public class StudentCourseDaoImpl implements StudentCourseDao {
     @Override
     public void enrollStudentInCourse(int studentId, int courseId) {
         try {
-            String sql = "INSERT INTO student_courses (student_id, course_id) VALUES (?, ?)";
+            String sql = "INSERT INTO students_courses (student_id, course_id) VALUES (?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, studentId);
             statement.setInt(2, courseId);

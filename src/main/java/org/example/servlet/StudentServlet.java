@@ -19,39 +19,38 @@ public class StudentServlet extends HttpServlet {
 
     private StudentDao studentDao;
 
-    public StudentServlet(StudentDao studentDao) {
-        this.studentDao = studentDao;
-    }
-
-    @Override
-    public void init() throws ServletException {
-        Connection connection; // Получите соединение
-        try {
-            connection = Database.getConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        public void init() {
+            try {
+                Connection connection = Database.getConnection(); // Проверьте, что этот метод подключается к вашей БД
+                studentDao = new StudentDaoImpl(connection);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        studentDao = new StudentDaoImpl(connection);
-    }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getParameter("name");
+        if (name == null || name.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Student name is required");
+            return;
+        }
+
         Student student = new Student();
-        student.setName(name);
+        student.setStudentName(name);
         studentDao.createStudent(student);
         response.setStatus(HttpServletResponse.SC_CREATED);
         response.getWriter().write("Student created with ID: " + student.getId());
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         List<Student> students = studentDao.getAllStudent();
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         out.write("[");
         for (int i = 0; i < students.size(); i++) {
-            out.write("{\"id\":" + students.get(i).getId() + ",\"name\":\"" + students.get(i).getName() + "\"}");
+            out.write("{\"id\":" + students.get(i).getId() + ",\"name\":\"" + students.get(i).getStudentName() + "\"}");
             if (i < students.size() - 1) {
                 out.write(",");
             }
@@ -60,22 +59,42 @@ public class StudentServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int studentId = Integer.parseInt(request.getParameter("id")); // Получаем ID студента
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int studentId;
+        try {
+            studentId = Integer.parseInt(request.getParameter("id")); // Получаем ID студента
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid student ID");
+            return;
+        }
+
         String name = request.getParameter("name"); // Получаем новое имя студента
+        if (name == null || name.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Student name is required");
+            return;
+        }
+
         Student student = new Student(); // Создаём объект Student
         student.setId(studentId);
-        student.setName(name);
+        student.setStudentName(name);
         studentDao.updateStudent(student); // Обновляем данные в базе
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write("Student updated with ID: " + student.getId());
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int studentId = Integer.parseInt(request.getParameter("id")); // Получаем ID студента
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int studentId;
+        try {
+            studentId = Integer.parseInt(request.getParameter("id")); // Получаем ID студента
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid student ID");
+            return;
+        }
+
         studentDao.deleteStudent(studentId); // Удаляем студента из базы
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write("Student deleted with ID: " + studentId);
     }
 }
+

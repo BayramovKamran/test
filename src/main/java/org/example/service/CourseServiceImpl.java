@@ -22,8 +22,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course getCourse(int id) {
-        Course course = courseDao.getCourse(id);
+    public Course getCourseById(int id) {
+        Course course = courseDao.getCourseById(id);
         if (course == null) {
             throw new NullPointerException("Course with id " + id + " not found");
         }

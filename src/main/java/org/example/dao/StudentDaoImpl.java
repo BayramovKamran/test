@@ -17,9 +17,9 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void createStudent(Student student) {
         try {
-            String sql = "INSERT INTO students (name) VALUES (?)";
+            String sql = "INSERT INTO students (studentname) VALUES (?)";
             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, student.getName());
+            statement.setString(1, student.getStudentName());
             statement.executeUpdate();
             ResultSet generatedKeys = statement.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -31,7 +31,7 @@ public class StudentDaoImpl implements StudentDao {
     }
 
     @Override
-    public Student getStudent(int id) {
+    public Student getStudentById(int id) {
         Student student = null;
         try {
             String sql = "SELECT * FROM students WHERE id = ?";
@@ -39,7 +39,7 @@ public class StudentDaoImpl implements StudentDao {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                student = new Student(resultSet.getInt("id"), resultSet.getString("name"));
+                student = new Student(resultSet.getInt("id"), resultSet.getString("studentname"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class StudentDaoImpl implements StudentDao {
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                students.add(new Student(resultSet.getInt("id"), resultSet.getString("name")));
+                students.add(new Student(resultSet.getInt("id"), resultSet.getString("studentname")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -66,9 +66,9 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void updateStudent(Student student) {
         try {
-            String sql = "UPDATE students SET name = ? WHERE id = ?";
+            String sql = "UPDATE students SET studentname = ? WHERE id = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, student.getName());
+            statement.setString(1, student.getStudentName());
             statement.setInt(2, student.getId());
             statement.executeUpdate();
         } catch (SQLException e) {

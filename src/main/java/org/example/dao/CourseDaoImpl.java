@@ -17,7 +17,7 @@ public class CourseDaoImpl implements CourseDao {
     @Override
     public void createCourse(Course course) {
         try {
-            String sql = "INSERT INTO courses (course_name) VALUES (?)";
+            String sql = "INSERT INTO courses (courseName) VALUES (?)";
             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, course.getCourseName());
             statement.executeUpdate();
@@ -31,7 +31,7 @@ public class CourseDaoImpl implements CourseDao {
     }
 
     @Override
-    public Course getCourse(int id) {
+    public Course getCourseById(int id) {
         Course course = null;
         try {
             String sql = "SELECT * FROM courses WHERE id = ?";
@@ -39,7 +39,7 @@ public class CourseDaoImpl implements CourseDao {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                course = new Course(resultSet.getInt("id"), resultSet.getString("course_name"));
+                course = new Course(resultSet.getInt("id"), resultSet.getString("courseName"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class CourseDaoImpl implements CourseDao {
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                courses.add(new Course(resultSet.getInt("id"), resultSet.getString("course_name")));
+                courses.add(new Course(resultSet.getInt("id"), resultSet.getString("courseName")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -66,7 +66,7 @@ public class CourseDaoImpl implements CourseDao {
     @Override
     public void updateCourse(Course course) {
         try {
-            String sql = "UPDATE courses SET course_name = ? WHERE id = ?";
+            String sql = "UPDATE courses SET courseName = ? WHERE id = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, course.getCourseName());
             statement.setInt(2, course.getId());

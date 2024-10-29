@@ -8,7 +8,7 @@ public interface StudentService {
 
     void createStudent(Student student);
 
-    Student getStudent(int id);
+    Student getStudentById(int id);
 
     List<Student> getAllStudent();
 

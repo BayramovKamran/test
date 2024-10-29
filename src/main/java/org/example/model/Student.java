@@ -1,15 +1,15 @@
 package org.example.model;
 
 public class Student {
+
     private int id;
-    private String name;
+    private String studentName;
 
     public Student() {
     }
-
     public Student(int id, String name) {
         this.id = id;
-        this.name = name;
+        this.studentName = name;
     }
 
     public int getId() {
@@ -20,11 +20,11 @@ public class Student {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getStudentName() {
+        return studentName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setStudentName(String name) {
+        this.studentName = name;
     }
 }

@@ -1,6 +1,7 @@
 package org.example.model;
 
 public class Course {
+
     private int id;
     private String courseName;
 
