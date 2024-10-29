@@ -1,8 +1,8 @@
+
 package org.example.service;
 
 import org.example.dao.StudentDao;
 import org.example.model.Student;
-
 import java.util.List;
 
 public class StudentServiceImpl implements StudentService {
@@ -15,11 +15,18 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void createStudent(Student student) {
+        if (student.getName() == null || student.getName().isEmpty()) {
+            throw new IllegalArgumentException("Student name cannot be empty.");
+        }
         studentDao.createStudent(student);
     }
 
     public Student getStudent(int id) {
-        return studentDao.getStudent(id);
+        Student student = studentDao.getStudent(id);
+        if (student == null) {
+            throw new NullPointerException("Student with ID " + id + " not found.");
+        }
+        return student;
     }
 
     public List<Student> getAllStudent() {
@@ -31,6 +38,9 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public void deleteStudent(int id) {
+        if (studentDao.getStudent(id) == null) {
+            throw new RuntimeException("Student with ID " + id + " not found.");
+        }
         studentDao.deleteStudent(id);
     }
 }
