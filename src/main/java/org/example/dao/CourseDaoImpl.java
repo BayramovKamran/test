@@ -5,9 +5,12 @@ import org.example.model.Course;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CourseDaoImpl implements CourseDao {
 
+    private static final Logger logger = Logger.getLogger(CourseDaoImpl.class.getName());
     private final Connection connection;
 
     public CourseDaoImpl(Connection connection) {
@@ -25,7 +28,7 @@ public class CourseDaoImpl implements CourseDao {
                 course.setId(rs.getInt(1));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error creating course", e);
         }
     }
 
@@ -40,7 +43,7 @@ public class CourseDaoImpl implements CourseDao {
                 course = new Course(rs.getInt("id"), rs.getString("course_name"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching course by ID: " + id, e);
         }
         return course;
     }
@@ -49,13 +52,13 @@ public class CourseDaoImpl implements CourseDao {
     public List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();
         String sql = "SELECT * FROM courses";
-        try (Statement stmt = connection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(sql);
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 courses.add(new Course(rs.getInt("id"), rs.getString("course_name")));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching all courses", e);
         }
         return courses;
     }
@@ -68,7 +71,7 @@ public class CourseDaoImpl implements CourseDao {
             pstmt.setInt(2, course.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error updating course with ID: " + course.getId(), e);
         }
     }
 
@@ -79,7 +82,7 @@ public class CourseDaoImpl implements CourseDao {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error deleting course with ID: " + id, e);
         }
     }
 }

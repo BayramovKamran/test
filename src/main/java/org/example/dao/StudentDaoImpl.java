@@ -5,9 +5,12 @@ import org.example.model.Student;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class StudentDaoImpl implements StudentDao {
 
+    private static final Logger logger = Logger.getLogger(StudentDaoImpl.class.getName());
     private final Connection connection;
 
     public StudentDaoImpl(Connection connection) {
@@ -25,7 +28,7 @@ public class StudentDaoImpl implements StudentDao {
                 student.setId(rs.getInt(1));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error creating student", e);
         }
     }
 
@@ -40,7 +43,7 @@ public class StudentDaoImpl implements StudentDao {
                 student = new Student(rs.getInt("id"), rs.getString("name"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching student by ID: " + id, e);
         }
         return student;
     }
@@ -49,13 +52,13 @@ public class StudentDaoImpl implements StudentDao {
     public List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT * FROM students";
-        try (Statement stmt = connection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(sql);
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 students.add(new Student(rs.getInt("id"), rs.getString("name")));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching all students", e);
         }
         return students;
     }
@@ -68,7 +71,7 @@ public class StudentDaoImpl implements StudentDao {
             pstmt.setInt(2, student.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error updating student with ID: " + student.getId(), e);
         }
     }
 
@@ -79,7 +82,7 @@ public class StudentDaoImpl implements StudentDao {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error deleting student with ID: " + id, e);
         }
     }
 }
