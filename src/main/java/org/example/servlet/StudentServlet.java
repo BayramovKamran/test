@@ -33,12 +33,19 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
         String name = request.getParameter("name");
+        if (name == null || name.trim().isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Student name cannot be null or empty\"}");
+            return;
+        }
         Student student = new Student();
         student.setName(name);
         studentDao.createStudent(student);
         response.setStatus(HttpServletResponse.SC_CREATED);
-        response.getWriter().write("Student created with ID: " + student.getId());
+        out.write("{\"message\":\"Student created with ID: " + student.getId() + "\"}");
     }
 
     @Override
@@ -72,21 +79,47 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int studentId = Integer.parseInt(request.getParameter("id"));
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        String idParam = request.getParameter("id");
         String name = request.getParameter("name");
-        Student student = new Student();
-        student.setId(studentId);
-        student.setName(name);
-        studentDao.updateStudent(student);
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write("Student updated with ID: " + student.getId());
+        if (idParam == null || name == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Student ID and name cannot be null\"}");
+            return;
+        }
+        try {
+            int studentId = Integer.parseInt(idParam);
+            Student student = new Student();
+            student.setId(studentId);
+            student.setName(name);
+            studentDao.updateStudent(student);
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.write("{\"message\":\"Student updated with ID: " + student.getId() + "\"}");
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Invalid student ID\"}");
+        }
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int studentId = Integer.parseInt(request.getParameter("id"));
-        studentDao.deleteStudent(studentId);
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write("Student deleted with ID: " + studentId);
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        String idParam = request.getParameter("id");
+        if (idParam == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Student ID cannot be null\"}");
+            return;
+        }
+        try {
+            int studentId = Integer.parseInt(idParam);
+            studentDao.deleteStudent(studentId);
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.write("{\"message\":\"Student deleted with ID: " + studentId + "\"}");
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Invalid student ID\"}");
+        }
     }
 }

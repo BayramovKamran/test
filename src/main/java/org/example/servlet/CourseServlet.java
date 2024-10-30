@@ -33,12 +33,19 @@ public class CourseServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
         String courseName = request.getParameter("course_name");
+        if (courseName == null || courseName.trim().isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Course name cannot be null or empty\"}");
+            return;
+        }
         Course course = new Course();
         course.setCourseName(courseName);
         courseDao.createCourse(course);
         response.setStatus(HttpServletResponse.SC_CREATED);
-        response.getWriter().write("Course created with ID: " + course.getId());
+        out.write("{\"message\":\"Course created with ID: " + course.getId() + "\"}");
     }
 
     @Override
@@ -72,21 +79,48 @@ public class CourseServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int courseId = Integer.parseInt(request.getParameter("id"));
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        String idParam = request.getParameter("id");
         String courseName = request.getParameter("course_name");
-        Course course = new Course();
-        course.setId(courseId);
-        course.setCourseName(courseName);
-        courseDao.updateCourse(course);
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write("Course updated with ID: " + course.getId());
+        if (idParam == null || courseName == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Course ID and name cannot be null\"}");
+            return;
+        }
+        try {
+            int courseId = Integer.parseInt(idParam);
+            Course course = new Course();
+            course.setId(courseId);
+            course.setCourseName(courseName);
+            courseDao.updateCourse(course);
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.write("{\"message\":\"Course updated with ID: " + course.getId() + "\"}");
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Invalid course ID\"}");
+        }
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int courseId = Integer.parseInt(request.getParameter("id"));
-        courseDao.deleteCourse(courseId);
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write("Course deleted with ID: " + courseId);
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        String idParam = request.getParameter("id");
+        if (idParam == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Course ID cannot be null\"}");
+            return;
+        }
+        try {
+            int courseId = Integer.parseInt(idParam);
+            courseDao.deleteCourse(courseId);
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.write("{\"message\":\"Course deleted with ID: " + courseId + "\"}");
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"error\":\"Invalid course ID\"}");
+        }
     }
 }
+
