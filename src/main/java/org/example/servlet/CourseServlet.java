@@ -41,7 +41,6 @@ public class CourseServlet extends HttpServlet {
         response.getWriter().write("Course created with ID: " + course.getId());
     }
 
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String idParam = request.getParameter("id");
@@ -70,7 +69,6 @@ public class CourseServlet extends HttpServlet {
             out.write("] ");
         }
     }
-
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
