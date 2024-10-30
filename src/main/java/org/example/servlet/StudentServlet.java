@@ -43,17 +43,31 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<Student> students = studentDao.getAllStudents();
+        String idParam = request.getParameter("id");
         response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        out.write("[");
-        for (int i = 0; i < students.size(); i++) {
-            out.write("{\"id\":" + students.get(i).getId() + ",\"name\":\"" + students.get(i).getName() + "\"}");
-            if (i < students.size() - 1) {
-                out.write(",");
+        if (idParam != null) {
+            int studentId = Integer.parseInt(idParam);
+            Student student = studentDao.getStudentById(studentId);
+            PrintWriter out = response.getWriter();
+            if (student != null) {
+                out.write("{\"id\":" + student.getId() + ",\"name\":\"" + student.getName() + "\"}");
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.write("{\"error\":\"Student not found\"}");
             }
+        } else {
+            List<Student> students = studentDao.getAllStudents();
+            PrintWriter out = response.getWriter();
+            out.write("[");
+            for (int i = 0; i < students.size(); i++) {
+                out.write("{\"id\":" + students.get(i).getId() + ",\"name\":\"" + students.get(i).getName() + "\"}");
+                if (i < students.size() - 1) {
+                    out.write(",");
+                }
+            }
+            out.write("]");
         }
-        out.write("]");
     }
 
     @Override

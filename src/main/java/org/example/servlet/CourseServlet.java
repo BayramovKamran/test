@@ -41,20 +41,36 @@ public class CourseServlet extends HttpServlet {
         response.getWriter().write("Course created with ID: " + course.getId());
     }
 
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<Course> courses = courseDao.getAllCourses();
+        String idParam = request.getParameter("id");
         response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        out.write("[");
-        for (int i = 0; i < courses.size(); i++) {
-            out.write("{\"id\":" + courses.get(i).getId() + ",\"course_name\":\"" + courses.get(i).getCourseName() + "\"}");
-            if (i < courses.size() - 1) {
-                out.write(",");
+        if (idParam != null) {
+            int courseId = Integer.parseInt(idParam);
+            Course course = courseDao.getCourseById(courseId);
+            PrintWriter out = response.getWriter();
+            if (course != null) {
+                out.write("{\"id\":" + course.getId() + ",\"course_name\":\"" + course.getCourseName() + "\"}");
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.write("{\"error\":\"Course not found\"}");
             }
+        } else {
+            List<Course> courses = courseDao.getAllCourses();
+            PrintWriter out = response.getWriter();
+            out.write("[");
+            for (int i = 0; i < courses.size(); i++) {
+                out.write("{\"id\":" + courses.get(i).getId() + ",\"course_name\":\"" + courses.get(i).getCourseName() + "\"}");
+                if (i < courses.size() - 1) {
+                    out.write(",");
+                }
+            }
+            out.write("] ");
         }
-        out.write("]");
     }
+
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
