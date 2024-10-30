@@ -15,7 +15,7 @@ public class CourseDaoImpl implements CourseDao {
     }
 
     @Override
-    public Course createCourse(Course course) {
+    public void createCourse(Course course) {
         String sql = "INSERT INTO courses (course_name) VALUES (?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, course.getCourseName());
@@ -27,7 +27,6 @@ public class CourseDaoImpl implements CourseDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return course;
     }
 
     @Override

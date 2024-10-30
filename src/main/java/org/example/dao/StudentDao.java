@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface StudentDao {
 
-    Student createStudent(Student student);
+    void createStudent(Student student);
 
     Student getStudentById(int id);
 

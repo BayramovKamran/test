@@ -29,7 +29,6 @@ class CourseDaoTest {
         }
     }
 
-
     @Test
     void testCreateCourse() {
         Course course = new Course();

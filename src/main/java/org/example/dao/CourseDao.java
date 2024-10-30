@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CourseDao {
 
-    Course createCourse(Course course);
+    void createCourse(Course course);
 
     Course getCourseById(int id);
 

@@ -15,7 +15,7 @@ public class StudentDaoImpl implements StudentDao {
     }
 
     @Override
-    public Student createStudent(Student student) {
+    public void createStudent(Student student) {
         String sql = "INSERT INTO students (name) VALUES (?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, student.getName());
@@ -27,7 +27,6 @@ public class StudentDaoImpl implements StudentDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return student;
     }
 
     @Override
