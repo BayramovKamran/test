@@ -49,8 +49,6 @@ class CourseDaoTest {
         Assertions.assertEquals("Java Programming", fetchedCourse.getCourseName());
     }
 
-
-
     @Test
     void testGetAllCourses() {
         Course course1 = new Course();

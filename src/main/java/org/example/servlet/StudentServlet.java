@@ -1,18 +1,35 @@
 package org.example.servlet;
 
+import com.google.gson.Gson;
 import org.example.dao.StudentDao;
+import org.example.dao.StudentDaoImpl;
 import org.example.model.Student;
+import org.example.util.Database;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/api/students")
 public class StudentServlet extends HttpServlet {
 
     private StudentDao studentDao;
+    Gson gson = new Gson();
+
+    @Override
+    public void init() {
+        try {
+            Connection connection = Database.getConnection();
+            studentDao = new StudentDaoImpl(connection);
+            gson = new Gson();
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to initialize CourseDao due to a database error: " + e.getMessage(), e);
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {

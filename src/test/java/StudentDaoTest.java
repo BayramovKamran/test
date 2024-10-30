@@ -18,7 +18,7 @@ class StudentDaoTest {
     @BeforeEach
     void setUp() throws SQLException {
         Server.createTcpServer().start();
-        connection = Database.getH2Connection(); // Пример метода подключения к H2
+        connection = Database.getH2Connection();
         studentDao = new StudentDaoImpl(connection);
         initializeDatabase();
     }
