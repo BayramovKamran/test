@@ -15,31 +15,14 @@ public class StudentDaoImpl implements StudentDao {
     }
 
     @Override
-    public void createStudent(Student student) {
-        try {
-            String sql = "INSERT INTO students (studentname) VALUES (?)";
-            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, student.getStudentName());
-            statement.executeUpdate();
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                student.setId(generatedKeys.getInt(1));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public Student getStudentById(int id) {
-        Student student = null;
-        try {
-            String sql = "SELECT * FROM students WHERE id = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                student = new Student(resultSet.getInt("id"), resultSet.getString("studentname"));
+    public Student createStudent(Student student) {
+        String sql = "INSERT INTO students (name) VALUES (?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, student.getName());
+            pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                student.setId(rs.getInt(1));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,14 +31,29 @@ public class StudentDaoImpl implements StudentDao {
     }
 
     @Override
-    public List<Student> getAllStudent() {
+    public Student getStudentById(int id) {
+        String sql = "SELECT * FROM students WHERE id = ?";
+        Student student = null;
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                student = new Student(rs.getInt("id"), rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return student;
+    }
+
+    @Override
+    public List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
-        try {
-            String sql = "SELECT * FROM students";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                students.add(new Student(resultSet.getInt("id"), resultSet.getString("studentname")));
+        String sql = "SELECT * FROM students";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                students.add(new Student(rs.getInt("id"), rs.getString("name")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -65,12 +63,11 @@ public class StudentDaoImpl implements StudentDao {
 
     @Override
     public void updateStudent(Student student) {
-        try {
-            String sql = "UPDATE students SET studentname = ? WHERE id = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, student.getStudentName());
-            statement.setInt(2, student.getId());
-            statement.executeUpdate();
+        String sql = "UPDATE students SET name = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, student.getName());
+            pstmt.setInt(2, student.getId());
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -78,11 +75,10 @@ public class StudentDaoImpl implements StudentDao {
 
     @Override
     public void deleteStudent(int id) {
-        try {
-            String sql = "DELETE FROM students WHERE id = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, id);
-            statement.executeUpdate();
+        String sql = "DELETE FROM students WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

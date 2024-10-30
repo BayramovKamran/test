@@ -25,58 +25,58 @@ class StudentDaoTest {
 
     private void initializeDatabase() throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            statement.execute("CREATE TABLE students (id INT AUTO_INCREMENT PRIMARY KEY, studentName VARCHAR(100) NOT NULL);");
+            statement.execute("CREATE TABLE students (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL);");
         }
     }
 
     @Test
     void testCreateStudent() {
         Student student = new Student();
-        student.setStudentName("Test Student");
+        student.setName("Test Student");
         studentDao.createStudent(student);
         Student fetchedStudent = studentDao.getStudentById(student.getId());
         Assertions.assertNotNull(fetchedStudent);
-        Assertions.assertEquals("Test Student", fetchedStudent.getStudentName());
+        Assertions.assertEquals("Test Student", fetchedStudent.getName());
     }
 
     @Test
     void testGetStudentById() {
         Student student = new Student();
-        student.setStudentName("John Doe");
+        student.setName("John Doe");
         studentDao.createStudent(student);
         Student fetchedStudent = studentDao.getStudentById(student.getId());
         Assertions.assertNotNull(fetchedStudent);
-        Assertions.assertEquals("John Doe", fetchedStudent.getStudentName());
+        Assertions.assertEquals("John Doe", fetchedStudent.getName());
     }
 
 
     @Test
     void testGetAllStudents() {
         Student student1 = new Student();
-        student1.setStudentName("Student One");
+        student1.setName("Student One");
         studentDao.createStudent(student1);
         Student student2 = new Student();
-        student2.setStudentName("Student Two");
+        student2.setName("Student Two");
         studentDao.createStudent(student2);
-        List<Student> students = studentDao.getAllStudent();
+        List<Student> students = studentDao.getAllStudents();
         Assertions.assertEquals(2, students.size());
     }
 
     @Test
     void testUpdateStudent() {
         Student student = new Student();
-        student.setStudentName("Old Name");
+        student.setName("Old Name");
         studentDao.createStudent(student);
-        student.setStudentName("New Name");
+        student.setName("New Name");
         studentDao.updateStudent(student);
         Student updatedStudent = studentDao.getStudentById(student.getId());
-        Assertions.assertEquals("New Name", updatedStudent.getStudentName());
+        Assertions.assertEquals("New Name", updatedStudent.getName());
     }
 
     @Test
     void testDeleteStudent() {
         Student student = new Student();
-        student.setStudentName("Test Student");
+        student.setName("Test Student");
         studentDao.createStudent(student);
         studentDao.deleteStudent(student.getId());
         Assertions.assertNull(studentDao.getStudentById(student.getId()));

@@ -15,31 +15,14 @@ public class CourseDaoImpl implements CourseDao {
     }
 
     @Override
-    public void createCourse(Course course) {
-        try {
-            String sql = "INSERT INTO courses (courseName) VALUES (?)";
-            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, course.getCourseName());
-            statement.executeUpdate();
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                course.setId(generatedKeys.getInt(1));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public Course getCourseById(int id) {
-        Course course = null;
-        try {
-            String sql = "SELECT * FROM courses WHERE id = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                course = new Course(resultSet.getInt("id"), resultSet.getString("courseName"));
+    public Course createCourse(Course course) {
+        String sql = "INSERT INTO courses (course_name) VALUES (?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, course.getCourseName());
+            pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                course.setId(rs.getInt(1));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,14 +31,29 @@ public class CourseDaoImpl implements CourseDao {
     }
 
     @Override
-    public List<Course> getAllCourse() {
+    public Course getCourseById(int id) {
+        String sql = "SELECT * FROM courses WHERE id = ?";
+        Course course = null;
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                course = new Course(rs.getInt("id"), rs.getString("course_name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return course;
+    }
+
+    @Override
+    public List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();
-        try {
-            String sql = "SELECT * FROM courses";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                courses.add(new Course(resultSet.getInt("id"), resultSet.getString("courseName")));
+        String sql = "SELECT * FROM courses";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                courses.add(new Course(rs.getInt("id"), rs.getString("course_name")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -65,12 +63,11 @@ public class CourseDaoImpl implements CourseDao {
 
     @Override
     public void updateCourse(Course course) {
-        try {
-            String sql = "UPDATE courses SET courseName = ? WHERE id = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, course.getCourseName());
-            statement.setInt(2, course.getId());
-            statement.executeUpdate();
+        String sql = "UPDATE courses SET course_name = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, course.getCourseName());
+            pstmt.setInt(2, course.getId());
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -78,11 +75,10 @@ public class CourseDaoImpl implements CourseDao {
 
     @Override
     public void deleteCourse(int id) {
-        try {
-            String sql = "DELETE FROM courses WHERE id = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, id);
-            statement.executeUpdate();
+        String sql = "DELETE FROM courses WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

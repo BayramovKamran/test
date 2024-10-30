@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface StudentDao {
 
-    void createStudent(Student student);
+    Student createStudent(Student student);
 
     Student getStudentById(int id);
 
-    List<Student> getAllStudent();
+    List<Student> getAllStudents();
 
     void updateStudent(Student student);
 

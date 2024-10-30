@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface CourseDao {
 
-    void createCourse(Course course);
+    Course createCourse(Course course);
 
     Course getCourseById(int id);
 
-    List<Course> getAllCourse();
+    List<Course> getAllCourses();
 
     void updateCourse(Course course);
 

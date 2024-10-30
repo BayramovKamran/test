@@ -25,7 +25,7 @@ class CourseDaoTest {
 
     private void initializeDatabase() throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            statement.execute("CREATE TABLE courses (id INT AUTO_INCREMENT PRIMARY KEY, courseName VARCHAR(100) NOT NULL);");
+            statement.execute("CREATE TABLE courses (id INT AUTO_INCREMENT PRIMARY KEY, course_name VARCHAR(100) NOT NULL);");
         }
     }
 
@@ -60,7 +60,7 @@ class CourseDaoTest {
         Course course2 = new Course();
         course2.setCourseName("Course Two");
         courseDao.createCourse(course2);
-        List<Course> courses = courseDao.getAllCourse();
+        List<Course> courses = courseDao.getAllCourses();
         Assertions.assertEquals(2, courses.size());
     }
 

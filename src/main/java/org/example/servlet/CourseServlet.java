@@ -5,7 +5,6 @@ import org.example.dao.CourseDaoImpl;
 import org.example.model.Course;
 import org.example.util.Database;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
@@ -16,13 +15,12 @@ import java.util.List;
 
 @WebServlet("/api/courses")
 public class CourseServlet extends HttpServlet {
-
     private CourseDao courseDao;
 
     @Override
     public void init() {
         try {
-            Connection connection = Database.getConnection(); // Проверьте, что этот метод подключается к вашей БД
+            Connection connection = Database.getConnection();
             courseDao = new CourseDaoImpl(connection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -31,12 +29,7 @@ public class CourseServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String courseName = request.getParameter("courseName");
-        if (courseName == null || courseName.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Course name is required");
-            return;
-        }
-
+        String courseName = request.getParameter("course_name");
         Course course = new Course();
         course.setCourseName(courseName);
         courseDao.createCourse(course);
@@ -46,12 +39,12 @@ public class CourseServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<Course> courses = courseDao.getAllCourse();
+        List<Course> courses = courseDao.getAllCourses();
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         out.write("[");
         for (int i = 0; i < courses.size(); i++) {
-            out.write("{\"id\":" + courses.get(i).getId() + ",\"courseName\":\"" + courses.get(i).getCourseName() + "\"}");
+            out.write("{\"id\":" + courses.get(i).getId() + ",\"course_name\":\"" + courses.get(i).getCourseName() + "\"}");
             if (i < courses.size() - 1) {
                 out.write(",");
             }
@@ -61,39 +54,20 @@ public class CourseServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int courseId;
-        try {
-            courseId = Integer.parseInt(request.getParameter("id")); // Получаем ID курса
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid course ID");
-            return;
-        }
-
-        String courseName = request.getParameter("courseName");
-        if (courseName == null || courseName.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Course name is required");
-            return;
-        }
-
-        Course course = new Course(); // Создаём объект Course
+        int courseId = Integer.parseInt(request.getParameter("id"));
+        String courseName = request.getParameter("course_name");
+        Course course = new Course();
         course.setId(courseId);
         course.setCourseName(courseName);
-        courseDao.updateCourse(course); // Обновляем данные в базе
+        courseDao.updateCourse(course);
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write("Course updated with ID: " + course.getId());
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int courseId;
-        try {
-            courseId = Integer.parseInt(request.getParameter("id")); // Получаем ID курса
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid course ID");
-            return;
-        }
-
-        courseDao.deleteCourse(courseId); // Удаляем курс из базы
+        int courseId = Integer.parseInt(request.getParameter("id"));
+        courseDao.deleteCourse(courseId);
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write("Course deleted with ID: " + courseId);
     }
