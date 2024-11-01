@@ -1,26 +1,22 @@
 package org.example.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Student {
-
     private int id;
     private String name;
-    List<Course> courses;
+    private final List<Course> courses;
 
     public Student() {
+        this.courses = new ArrayList<>();
     }
 
     public Student(int id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    public Student(int id, String name,  List<Course> courses) {
-        this.id = id;
-        this.name = name;
-        this.courses = courses;
+        this.courses = new ArrayList<>();
     }
 
     public int getId() {
@@ -43,8 +39,12 @@ public class Student {
         return courses;
     }
 
-    public void setCourses(List<Course> courses) {
-        this.courses = courses;
+    public void addCourse(Course course) {
+        courses.add(course);
+    }
+
+    public void removeCourse(Course course) {
+        courses.remove(course);
     }
 
     @Override
@@ -52,11 +52,14 @@ public class Student {
         if (this == o) return true;
         if (!(o instanceof Student)) return false;
         Student student = (Student) o;
-        return id == student.id && Objects.equals(name, student.name);
+        return id == student.id &&
+                Objects.equals(name, student.name) &&
+                Objects.equals(courses, student.courses);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(id, name, courses);
     }
 }
+
